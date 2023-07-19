@@ -395,13 +395,25 @@ void Events::listener_mapWindow(void* owner, void* data) {
                             posX = g_pInputManager->getMouseCoordsInternal().x - PMONITOR->vecPosition.x;
                         } else {
                           if(POSXSTR.contains('a')){      // absolute
-                            posX = PMONITOR->vecPosition.x + std::stoi(POSXSTR.substr(0, POSXSTR.length() - 1));
+                            posX = std::stoi(POSXSTR.substr(0, POSXSTR.length() - 1));
                           }
                           else if(POSXSTR.contains('r')){ // relative
                             posX = PWINDOW->m_vRealSize.goalv().x + std::stoi(POSXSTR.substr(0, POSXSTR.length() - 1));
                           } else {
                             posX = g_pInputManager->getMouseCoordsInternal().x - PMONITOR->vecPosition.x +
-                                (!POSXSTR.contains('%') ? std::stoi(POSXSTR) : std::stof(POSXSTR.substr(0, POSXSTR.length() - 1)) * 0.01 * PWINDOW->m_vRealSize.goalv().x);
+                                (!POSXSTR.contains('%') ?
+                                 std::stoi(POSXSTR) :
+                                 (!POSXSTR.contains('c') ?
+                                 std::stof(POSXSTR.substr(0, POSXSTR.length() - 1)) * 0.01 * PWINDOW->m_vRealSize.goalv().x :
+                                 std::stof(POSXSTR.substr(0, POSXSTR.length() - 2)) * 0.01 * PWINDOW->m_vRealSize.goalv().x));
+                                 if(POSXSTR.contains('c')) {
+                                   if(posX+PWINDOW->m_vRealSize.goalv().x > PMONITOR->vecSize.x){
+                                     posX = PMONITOR->vecSize.x-PWINDOW->m_vRealSize.goalv().x;
+                                   }
+                                   else if(posX+PMONITOR->vecPosition.x < PMONITOR->vecPosition.x){
+                                     posX = 0;
+                                  }
+                                }
                           }
                         }
                     }
@@ -421,13 +433,25 @@ void Events::listener_mapWindow(void* owner, void* data) {
                             posY = g_pInputManager->getMouseCoordsInternal().y - PMONITOR->vecPosition.y;
                         } else {
                           if(POSYSTR.contains('a')){      // absolute
-                            posY = PMONITOR->vecPosition.y + std::stoi(POSYSTR.substr(0, POSYSTR.length() - 1));
+                            posY = std::stoi(POSYSTR.substr(0, POSYSTR.length() - 1));
                           }
                           else if(POSYSTR.contains('r')){ // relative
                             posY = PWINDOW->m_vRealSize.goalv().y + std::stoi(POSYSTR.substr(0, POSYSTR.length() - 1));
                           } else {
                             posY = g_pInputManager->getMouseCoordsInternal().y - PMONITOR->vecPosition.y +
-                                (!POSYSTR.contains('%') ? std::stoi(POSYSTR) : std::stof(POSYSTR.substr(0, POSYSTR.length() - 1)) * 0.01 * PWINDOW->m_vRealSize.goalv().y);
+                                (!POSYSTR.contains('%') ?
+                                 std::stoi(POSYSTR) :
+                                 (!POSYSTR.contains('c') ?
+                                 std::stof(POSYSTR.substr(0, POSYSTR.length() - 1)) * 0.01 * PWINDOW->m_vRealSize.goalv().y :
+                                 std::stof(POSYSTR.substr(0, POSYSTR.length() - 2)) * 0.01 * PWINDOW->m_vRealSize.goalv().y));
+                                 if(POSYSTR.contains('c')) {
+                                   if(posY+PMONITOR->vecPosition.y > PMONITOR->vecSize.y-PWINDOW->m_vRealSize.goalv().y){
+                                     posY = PMONITOR->vecSize.y-PWINDOW->m_vRealSize.goalv().y;
+                                   }
+                                   else if(posY+PMONITOR->vecPosition.y < PMONITOR->vecPosition.y){
+                                     posY = PMONITOR->vecPosition.y;
+                                   }
+                                 }
                           }
                         }
                     }
