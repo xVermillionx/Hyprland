@@ -337,7 +337,9 @@ void Events::listener_mapWindow(void* owner, void* data) {
                     if (ONSCREEN)
                         value = value.substr(value.find_first_of(' ') + 1);
 
-                    const bool CURSOR = value.starts_with("cursor");
+                    // const bool CURSOR = value.starts_with("cursor");
+                    const bool CURSOR = value.find("cursor") == 0;
+                    // const bool RELATIVE = value.find("relative") == 0;
 
                     if (CURSOR)
                         value = value.substr(value.find_first_of(' ') + 1);
@@ -362,8 +364,15 @@ void Events::listener_mapWindow(void* owner, void* data) {
                         if (POSXSTR == "cursor") {
                             posX = g_pInputManager->getMouseCoordsInternal().x - PMONITOR->vecPosition.x;
                         } else {
+                          if(POSXSTR.contains('a')){      // absolute
+                            posX = PMONITOR->vecPosition.x + std::stoi(POSXSTR.substr(0, POSXSTR.length() - 1));
+                          }
+                          else if(POSXSTR.contains('r')){ // relative
+                            posX = PWINDOW->m_vRealSize.goalv().x + std::stoi(POSXSTR.substr(0, POSXSTR.length() - 1));
+                          } else {
                             posX = g_pInputManager->getMouseCoordsInternal().x - PMONITOR->vecPosition.x +
                                 (!POSXSTR.contains('%') ? std::stoi(POSXSTR) : std::stof(POSXSTR.substr(0, POSXSTR.length() - 1)) * 0.01 * PWINDOW->m_vRealSize.goal().x);
+                          }
                         }
                     }
 
@@ -381,8 +390,15 @@ void Events::listener_mapWindow(void* owner, void* data) {
                         if (POSYSTR == "cursor") {
                             posY = g_pInputManager->getMouseCoordsInternal().y - PMONITOR->vecPosition.y;
                         } else {
+                          if(POSYSTR.contains('a')){      // absolute
+                            posY = PMONITOR->vecPosition.y + std::stoi(POSYSTR.substr(0, POSYSTR.length() - 1));
+                          }
+                          else if(POSYSTR.contains('r')){ // relative
+                            posY = PWINDOW->m_vRealSize.goalv().y + std::stoi(POSYSTR.substr(0, POSYSTR.length() - 1));
+                          } else {
                             posY = g_pInputManager->getMouseCoordsInternal().y - PMONITOR->vecPosition.y +
                                 (!POSYSTR.contains('%') ? std::stoi(POSYSTR) : std::stof(POSYSTR.substr(0, POSYSTR.length() - 1)) * 0.01 * PWINDOW->m_vRealSize.goal().y);
+                          }
                         }
                     }
 
