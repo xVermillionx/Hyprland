@@ -173,6 +173,7 @@ class CCompositor {
     int            getNextAvailableMonitorID(std::string const& name);
     void           moveWorkspaceToMonitor(CWorkspace*, CMonitor*, bool noWarpCursor = false);
     void           swapActiveWorkspaces(CMonitor*, CMonitor*);
+    void           swapActiveWorkspaceAndOtherWorkspace(CWorkspace*, CWorkspace*);
     CMonitor*      getMonitorFromString(const std::string&);
     bool           workspaceIDOutOfBounds(const int64_t&);
     void           setWindowFullscreen(CWindow*, bool, eFullscreenMode mode = FULLSCREEN_INVALID);

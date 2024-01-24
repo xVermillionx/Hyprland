@@ -1980,6 +1980,81 @@ int CCompositor::getNextAvailableMonitorID(std::string const& name) {
     return nextID;
 }
 
+void CCompositor::swapActiveWorkspaceAndOtherWorkspace(CWorkspace* pWorkspaceA, CWorkspace* pWorkspaceB) {
+
+    const auto PMONITORA = g_pCompositor->getMonitorFromID(pWorkspaceA->m_iMonitorID);
+    const auto PMONITORB = g_pCompositor->getMonitorFromID(pWorkspaceB->m_iMonitorID);
+    const bool SAMEMON = PMONITORB == PMONITORA;
+
+    pWorkspaceB->m_iMonitorID = PMONITORA->ID;
+    pWorkspaceB->moveToMonitor(PMONITORA->ID);
+    pWorkspaceA->m_iMonitorID = PMONITORB->ID;
+    pWorkspaceA->moveToMonitor(PMONITORB->ID);
+
+    for (auto& w : m_vWindows) {
+        if (w->m_iWorkspaceID == pWorkspaceA->m_iID) {
+            if (w->m_bPinned) {
+                w->m_iWorkspaceID = pWorkspaceB->m_iID;
+                continue;
+            }
+
+            w->m_iMonitorID = PMONITORB->ID;
+            w->m_iWorkspaceID = pWorkspaceB->m_iID;
+
+            // additionally, move floating and fs windows manually
+            if (w->m_bIsFloating)
+                w->m_vRealPosition = w->m_vRealPosition.vec() - PMONITORA->vecPosition + PMONITORB->vecPosition;
+
+            if (w->m_bIsFullscreen) {
+                w->m_vRealPosition = PMONITORB->vecPosition;
+                w->m_vRealSize     = PMONITORB->vecSize;
+            }
+
+            w->updateToplevel();
+        }
+        else if (w->m_iWorkspaceID == pWorkspaceB->m_iID) {
+            if (w->m_bPinned) {
+                w->m_iWorkspaceID = pWorkspaceA->m_iID;
+                continue;
+            }
+
+            w->m_iMonitorID = PMONITORA->ID;
+            w->m_iWorkspaceID = pWorkspaceA->m_iID;
+
+            // additionally, move floating and fs windows manually
+            if (w->m_bIsFloating)
+                w->m_vRealPosition = w->m_vRealPosition.vec() - PMONITORB->vecPosition + PMONITORA->vecPosition;
+
+            if (w->m_bIsFullscreen) {
+                w->m_vRealPosition = PMONITORA->vecPosition;
+                w->m_vRealSize     = PMONITORA->vecSize;
+            }
+
+            w->updateToplevel();
+        }
+    }
+
+    if(!SAMEMON){
+      PMONITORA->activeWorkspace = pWorkspaceB->m_iID;
+      PMONITORB->activeWorkspace = pWorkspaceA->m_iID;
+      g_pLayoutManager->getCurrentLayout()->recalculateMonitor(PMONITORA->ID);
+      g_pLayoutManager->getCurrentLayout()->recalculateMonitor(PMONITORB->ID);
+    } else {
+      g_pLayoutManager->getCurrentLayout()->recalculateMonitor(PMONITORA->ID);
+    }
+
+    updateFullscreenFadeOnWorkspace(pWorkspaceB);
+    updateFullscreenFadeOnWorkspace(pWorkspaceA);
+
+    g_pInputManager->sendMotionEventsToFocused();
+
+    // event
+    g_pEventManager->postEvent(SHyprIPCEvent{"moveworkspace", pWorkspaceA->m_szName + "," + PMONITORB->szName});
+    EMIT_HOOK_EVENT("moveWorkspace", (std::vector<void*>{pWorkspaceA, PMONITORB}));
+    g_pEventManager->postEvent(SHyprIPCEvent{"moveworkspace", pWorkspaceB->m_szName + "," + PMONITORA->szName});
+    EMIT_HOOK_EVENT("moveWorkspace", (std::vector<void*>{pWorkspaceB, PMONITORA}));
+}
+
 void CCompositor::swapActiveWorkspaces(CMonitor* pMonitorA, CMonitor* pMonitorB) {
 
     const auto PWORKSPACEA = g_pCompositor->getWorkspaceByID(pMonitorA->activeWorkspace);

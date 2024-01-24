@@ -47,6 +47,7 @@ CKeybindManager::CKeybindManager() {
     m_mDispatchers["movecursor"]                     = moveCursor;
     m_mDispatchers["workspaceopt"]                   = workspaceOpt;
     m_mDispatchers["exit"]                           = exitHyprland;
+    m_mDispatchers["swapactiveworkspaceandotherworkspace"] = swapActiveWorkspaceAndOtherWorkspace;
     m_mDispatchers["movecurrentworkspacetomonitor"]  = moveCurrentWorkspaceToMonitor;
     m_mDispatchers["focusworkspaceoncurrentmonitor"] = focusWorkspaceOnCurrentMonitor;
     m_mDispatchers["moveworkspacetomonitor"]         = moveWorkspaceToMonitor;
@@ -1509,6 +1510,21 @@ void CKeybindManager::moveCurrentWorkspaceToMonitor(std::string args) {
     }
 
     g_pCompositor->moveWorkspaceToMonitor(PCURRENTWORKSPACE, PMONITOR);
+}
+
+void CKeybindManager::swapActiveWorkspaceAndOtherWorkspace(std::string args) {
+    CWorkspace* POTHERWORKSPACE = g_pCompositor->getWorkspaceByString(args);
+
+    if (!POTHERWORKSPACE)
+        return;
+
+    // get the current workspace
+    const auto PCURRENTWORKSPACE = g_pCompositor->getWorkspaceByID(g_pCompositor->m_pLastMonitor->activeWorkspace);
+
+    if (!PCURRENTWORKSPACE)
+        return;
+
+    g_pCompositor->swapActiveWorkspaceAndOtherWorkspace(PCURRENTWORKSPACE, POTHERWORKSPACE);
 }
 
 void CKeybindManager::moveWorkspaceToMonitor(std::string args) {
