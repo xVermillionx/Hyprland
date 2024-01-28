@@ -1984,7 +1984,7 @@ void CCompositor::swapActiveWorkspaceAndOtherWorkspace(CWorkspace* pWorkspaceA, 
 
     const auto PMONITORA = g_pCompositor->getMonitorFromID(pWorkspaceA->m_iMonitorID);
     const auto PMONITORB = g_pCompositor->getMonitorFromID(pWorkspaceB->m_iMonitorID);
-    const bool SAMEMON = PMONITORB == PMONITORA;
+    const bool SAMEMON = PMONITORB->ID == PMONITORA->ID;
 
     pWorkspaceB->m_iMonitorID = PMONITORA->ID;
     pWorkspaceB->moveToMonitor(PMONITORA->ID);
@@ -2011,6 +2011,7 @@ void CCompositor::swapActiveWorkspaceAndOtherWorkspace(CWorkspace* pWorkspaceA, 
             }
 
             w->updateToplevel();
+            w->updateDynamicRules();
         }
         else if (w->m_iWorkspaceID == pWorkspaceB->m_iID) {
             if (w->m_bPinned) {
@@ -2031,20 +2032,25 @@ void CCompositor::swapActiveWorkspaceAndOtherWorkspace(CWorkspace* pWorkspaceA, 
             }
 
             w->updateToplevel();
+            w->updateDynamicRules();
         }
     }
 
     if(!SAMEMON){
-      PMONITORA->activeWorkspace = pWorkspaceB->m_iID;
-      PMONITORB->activeWorkspace = pWorkspaceA->m_iID;
+      PMONITORA->activeWorkspace = pWorkspaceA->m_iID;
+      PMONITORB->activeWorkspace = pWorkspaceB->m_iID;
       g_pLayoutManager->getCurrentLayout()->recalculateMonitor(PMONITORA->ID);
       g_pLayoutManager->getCurrentLayout()->recalculateMonitor(PMONITORB->ID);
+      updateFullscreenFadeOnWorkspace(pWorkspaceB);
+      updateFullscreenFadeOnWorkspace(pWorkspaceA);
+      updateWorkspaceWindows(pWorkspaceB->m_iID);
+      updateWorkspaceWindows(pWorkspaceA->m_iID);
     } else {
+      PMONITORA->activeWorkspace = pWorkspaceA->m_iID;
       g_pLayoutManager->getCurrentLayout()->recalculateMonitor(PMONITORA->ID);
+      updateFullscreenFadeOnWorkspace(pWorkspaceA);
+      updateWorkspaceWindows(pWorkspaceA->m_iID);
     }
-
-    updateFullscreenFadeOnWorkspace(pWorkspaceB);
-    updateFullscreenFadeOnWorkspace(pWorkspaceA);
 
     g_pInputManager->sendMotionEventsToFocused();
 
