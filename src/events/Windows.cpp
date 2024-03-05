@@ -368,7 +368,7 @@ void Events::listener_mapWindow(void* owner, void* data) {
                             posX = std::stoi(POSXSTR.substr(0, POSXSTR.length() - 1));
                           }
                           else if(POSXSTR.contains('r')){ // relative
-                            posX = PWINDOW->m_vRealSize.goalv().x + std::stoi(POSXSTR.substr(0, POSXSTR.length() - 1));
+                            posX = PWINDOW->m_vRealSize.goal().x + std::stoi(POSXSTR.substr(0, POSXSTR.length() - 1));
                           } else {
                             posX = g_pInputManager->getMouseCoordsInternal().x - PMONITOR->vecPosition.x +
                                 (!POSXSTR.contains('%') ?
@@ -406,7 +406,7 @@ void Events::listener_mapWindow(void* owner, void* data) {
                             posY = std::stoi(POSYSTR.substr(0, POSYSTR.length() - 1));
                           }
                           else if(POSYSTR.contains('r')){ // relative
-                            posY = PWINDOW->m_vRealSize.goalv().y + std::stoi(POSYSTR.substr(0, POSYSTR.length() - 1));
+                            posY = PWINDOW->m_vRealSize.goal().y + std::stoi(POSYSTR.substr(0, POSYSTR.length() - 1));
                           } else {
                             posY = g_pInputManager->getMouseCoordsInternal().y - PMONITOR->vecPosition.y +
                                 (!POSYSTR.contains('%') ?

@@ -2003,7 +2003,7 @@ void CCompositor::swapActiveWorkspaceAndOtherWorkspace(CWorkspace* pWorkspaceA, 
 
             // additionally, move floating and fs windows manually
             if (w->m_bIsFloating)
-                w->m_vRealPosition = w->m_vRealPosition.vec() - PMONITORA->vecPosition + PMONITORB->vecPosition;
+                w->m_vRealPosition = w->m_vRealPosition.value() - PMONITORA->vecPosition + PMONITORB->vecPosition;
 
             if (w->m_bIsFullscreen) {
                 w->m_vRealPosition = PMONITORB->vecPosition;
@@ -2024,7 +2024,7 @@ void CCompositor::swapActiveWorkspaceAndOtherWorkspace(CWorkspace* pWorkspaceA, 
 
             // additionally, move floating and fs windows manually
             if (w->m_bIsFloating)
-                w->m_vRealPosition = w->m_vRealPosition.vec() - PMONITORB->vecPosition + PMONITORA->vecPosition;
+                w->m_vRealPosition = w->m_vRealPosition.value() - PMONITORB->vecPosition + PMONITORA->vecPosition;
 
             if (w->m_bIsFullscreen) {
                 w->m_vRealPosition = PMONITORA->vecPosition;
